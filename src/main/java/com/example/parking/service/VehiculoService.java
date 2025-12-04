@@ -19,4 +19,12 @@ public class VehiculoService {
 
         return dto;
     }
+
+    public VehiculoDTO eliminarVehiculo(VehiculoDTO dto) {
+        VehiculoEntity vehiculoEntity= VehiculoMapper.toEntity(dto);
+        vehiculoEntity.setEstado(true);
+        repo.delete(vehiculoEntity);
+
+        return dto;
+    }
 }

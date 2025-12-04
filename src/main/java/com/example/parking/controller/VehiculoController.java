@@ -6,10 +6,7 @@ import com.example.parking.dto.VehiculoDTO;
 import com.example.parking.service.VehiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -25,5 +22,11 @@ public class VehiculoController {
         return ResponseEntity.ok(vehiculoRegistrado);
     }
 
+    @DeleteMapping//eliminar vehiculo
+    public ResponseEntity<VehiculoDTO>eliminarVehiculo(@RequestBody VehiculoDTO dto){
+        VehiculoDTO vehiculoEliminado = service.eliminarVehiculo(dto);
+        return ResponseEntity.ok(vehiculoEliminado);
+
+    }
 
 }

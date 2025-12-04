@@ -8,7 +8,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
+    @ Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // Permitir acceso a la consola H2
@@ -16,10 +16,11 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()  // permitir H2
                         .anyRequest().authenticated()                  // resto requiere login
                 )
-                .formLogin()
-                .and()
-                .logout()
-                .and()
+                // Login por formulario
+                .formLogin(form -> form
+                        .loginPage("/login")      // opcional (puedes quitar esta línea)
+                        .permitAll()
+                )
                 // Configuraciones especiales para H2 console
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")   // deshabilitar CSRF para H2
