@@ -1,3 +1,4 @@
+
 package com.example.parking.config;
 
 import org.springframework.context.annotation.Bean;
@@ -8,7 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    @ Bean
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // Permitir acceso a la consola H2
@@ -18,7 +19,7 @@ public class SecurityConfig {
                 )
                 // Login por formulario
                 .formLogin(form -> form
-                        .loginPage("/login")      // opcional (puedes quitar esta línea)
+                        .loginPage("/login")      // opcional
                         .permitAll()
                 )
                 // Configuraciones especiales para H2 console
@@ -32,4 +33,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-
