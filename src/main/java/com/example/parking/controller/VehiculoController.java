@@ -2,6 +2,7 @@
 package com.example.parking.controller;
 
 
+import com.example.parking.dto.FacturaDTO;
 import com.example.parking.dto.VehiculoDTO;
 import com.example.parking.service.VehiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,12 @@ public class VehiculoController {
         VehiculoDTO vehiculoEliminado = service.eliminarVehiculo(dto);
         return ResponseEntity.ok(vehiculoEliminado);
 
+    }
+
+    @PutMapping
+    public ResponseEntity<FacturaDTO> darSalida(@RequestBody String matricula) throws Exception{
+        FacturaDTO factura = service.darSalida (matricula);
+        return ResponseEntity.ok(factura);
     }
 
 }

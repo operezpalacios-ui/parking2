@@ -1,4 +1,3 @@
-
 package com.example.parking.config;
 
 import org.springframework.context.annotation.Bean;
@@ -11,24 +10,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                // Permitir acceso a la consola H2
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()  // permitir H2
-                        .anyRequest().authenticated()                  // resto requiere login
+                        .requestMatchers("/h2-console/**").permitAll()   // acceso libre a H2
+                        .requestMatchers("/vehiculos/**").permitAll()    // acceso libre a tu API
+                        .anyRequest().permitAll()                        // NADA requiere login
                 )
-                // Login por formulario
-                .formLogin(form -> form
-                        .loginPage("/login")      // opcional
-                        .permitAll()
-                )
-                // Configuraciones especiales para H2 console
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**")   // deshabilitar CSRF para H2
+                        .ignoringRequestMatchers("/h2-console/**", "/vehiculos/**")
+                        .disable()                                       // desactiva CSRF por completo
                 )
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())   // permitir frames para H2
-                );
+                        .frameOptions(frame -> frame.sameOrigin())       // necesario para H2
+                )
+                .formLogin(login -> login.disable())                     // desactiva login
+                .httpBasic(basic -> basic.disable());                    // desactiva basic auth
 
         return http.build();
     }
