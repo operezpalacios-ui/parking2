@@ -23,10 +23,15 @@ public class VehiculoController {
     }
 
     @DeleteMapping//eliminar vehiculo
-    public ResponseEntity<VehiculoDTO>eliminarVehiculo(@RequestBody VehiculoDTO dto){
-        VehiculoDTO vehiculoEliminado = service.eliminarVehiculo(dto);
+    public ResponseEntity<VehiculoDTO>eliminarVehiculo(@PathVariable String matricula){
+        VehiculoDTO vehiculoEliminado = service.eliminarVehiculo(matricula);
         return ResponseEntity.ok(vehiculoEliminado);
 
+    }
+    @GetMapping("/{matricula}") // buscar Vehiculo
+    public ResponseEntity<VehiculoDTO> buscarMatricula(@PathVariable String matricula) {
+        VehiculoDTO vehiculo = service.buscarPorMatricula(matricula);
+        return ResponseEntity.ok(vehiculo);
     }
 
 }
