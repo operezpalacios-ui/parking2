@@ -2,6 +2,7 @@
 package com.example.parking.controller;
 
 
+import com.example.parking.dto.FacturaDTO;
 import com.example.parking.dto.VehiculoDTO;
 import com.example.parking.service.VehiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,12 @@ public class VehiculoController {
     public ResponseEntity<VehiculoDTO> buscarMatricula(@PathVariable String matricula) {
         VehiculoDTO vehiculo = service.buscarPorMatricula(matricula);
         return ResponseEntity.ok(vehiculo);
+    }
+
+    @PutMapping
+    public ResponseEntity<FacturaDTO> darSalida(@RequestBody String matricula) throws Exception{
+        FacturaDTO factura = service.darSalida (matricula);
+        return ResponseEntity.ok(factura);
     }
 
 }
