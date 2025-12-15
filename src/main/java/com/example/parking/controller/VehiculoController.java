@@ -3,6 +3,7 @@ package com.example.parking.controller;
 
 
 import com.example.parking.dto.FacturaDTO;
+import com.example.parking.dto.SalidaDTO;
 import com.example.parking.dto.VehiculoDTO;
 import com.example.parking.service.VehiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,25 +19,29 @@ public class VehiculoController {
 
 
     @PostMapping//registrar vehiculo
-    public ResponseEntity<VehiculoDTO>registrarVehiculo(@RequestBody VehiculoDTO dto) {
+    public ResponseEntity<VehiculoDTO>registrarVehiculo(@RequestBody VehiculoDTO dto) throws Exception {
         VehiculoDTO vehiculoRegistrado = service.registrarVehiculo(dto);
         return ResponseEntity.ok(vehiculoRegistrado);
     }
 
-    @DeleteMapping//eliminar vehiculo
-    public ResponseEntity<VehiculoDTO>eliminarVehiculo(@PathVariable String matricula){
-        VehiculoDTO vehiculoEliminado = service.eliminarVehiculo(matricula);
-        return ResponseEntity.ok(vehiculoEliminado);
+    @DeleteMapping("/{matricula}")
+    public ResponseEntity<SalidaDTO> eliminarVehiculo(@PathVariable String matricula) {
+
+        service.eliminarVehiculo(matricula);
+        SalidaDTO salidaDTO = new SalidaDTO("Se ha eliminado correctamente");
+        return ResponseEntity.ok(salidaDTO);
 
     }
+
+
     @GetMapping("/{matricula}") // buscar Vehiculo
     public ResponseEntity<VehiculoDTO> buscarMatricula(@PathVariable String matricula) {
         VehiculoDTO vehiculo = service.buscarPorMatricula(matricula);
         return ResponseEntity.ok(vehiculo);
     }
 
-    @PutMapping
-    public ResponseEntity<FacturaDTO> darSalida(@RequestBody String matricula) throws Exception{
+    @PutMapping("/{matricula}")
+    public ResponseEntity<FacturaDTO> darSalida(@PathVariable String matricula) throws Exception{
         FacturaDTO factura = service.darSalida (matricula);
         return ResponseEntity.ok(factura);
     }

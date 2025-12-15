@@ -6,6 +6,7 @@ import com.example.parking.entity.VehiculoEntity;
 import com.example.parking.exception.VehiculoNoEncontradoException;
 import com.example.parking.mapper.VehiculoMapper;
 import com.example.parking.repository.VehiculoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.parking.exception.VehiculoNoEncontradoException;
@@ -19,68 +20,81 @@ public class VehiculoService {
     @Autowired
     private VehiculoRepository repo;
 
-    public VehiculoDTO registrarVehiculo(VehiculoDTO dto) {
+    public VehiculoDTO registrarVehiculo(VehiculoDTO dto) throws Exception {
         VehiculoEntity vehiculoEntity = VehiculoMapper.toEntity(dto);
-        vehiculoEntity.setEstado(true);
-        repo.save(vehiculoEntity);
 
+        if (repo.findById(vehiculoEntity.getMatricula()).isEmpty()) {
+            vehiculoEntity.setEstado(true);
+            repo.save(vehiculoEntity);
+            return VehiculoMapper.toDTO(vehiculoEntity);
+        }
+
+        if (!repo.existsByMatriculaAndEstadoTrue(vehiculoEntity.getMatricula())) {
+            vehiculoEntity.setEstado(true);
+            repo.save(vehiculoEntity);
+        } else {
+            throw new Exception("El vehiculo ya se encuentra en el parking");
+        }
+
+        dto =VehiculoMapper.toDTO(vehiculoEntity);
         return dto;
     }
 
-<<<<<<< HEAD
-    public VehiculoDTO eliminarVehiculo(String matricula) {
-        VehiculoEntity vehiculoEntity = repo.findById(matricula)
-                .orElseThrow(() -> new VehiculoNoEncontradoException("Vehículo no encontrado: " + matricula));
-=======
-    public VehiculoDTO eliminarVehiculo(VehiculoDTO dto) {
-        VehiculoEntity vehiculoEntity = VehiculoMapper.toEntity(dto);
-        vehiculoEntity.setEstado(true);
->>>>>>> 5e35cfb44b26c6a54eef665d5661ab8fa2345f86
-        repo.delete(vehiculoEntity);
-        return VehiculoMapper.toDTO(vehiculoEntity);
+
+    public void eliminarVehiculo(String matricula) {
+
+        VehiculoEntity vehiculoEntity = new VehiculoEntity();
+        vehiculoEntity.setMatricula(matricula);
+        try{
+            repo.delete(vehiculoEntity);
+        } catch (Exception e) {
+            throw new VehiculoNoEncontradoException("El vehiculo no se encuentra en la base de datos");
+        }
     }
-<<<<<<< HEAD
+
     public VehiculoDTO buscarPorMatricula(String matricula) {
         VehiculoEntity vehiculoEntity = repo.findById(matricula)
                 .orElseThrow(() -> new VehiculoNoEncontradoException("Vehículo no encontrado: " + matricula));
         return VehiculoMapper.toDTO(vehiculoEntity);
-
     }
-
-
-=======
-
 
     public FacturaDTO darSalida(String matricula) throws Exception {
 
-        Optional<VehiculoEntity> vehiculoOpt = repo.findById(matricula);
-
-        if (vehiculoOpt.isPresent()) {
-
-            VehiculoEntity vehiculoEntity = vehiculoOpt.get();
-            // Aquí actualizas los datos de salida, horaSalida, estado, etc.
-            vehiculoEntity.setHoraSalida(System.currentTimeMillis());
-            vehiculoEntity.setEstado(false); // ya no está aparcado
-
-            // Guardar los cambios en la base de datos
-            repo.save(vehiculoEntity);
-
-            FacturaDTO factura = new FacturaDTO();
-            factura.setMatricula(vehiculoEntity.getMatricula());
-            factura.setTarifa(vehiculoEntity.getTarifa());
-            factura.setHoraEntrada(vehiculoEntity.getHoraEntrada());
-            factura.setHoraSalida(vehiculoEntity.getHoraSalida());
-
-            long duracionMillis = vehiculoEntity.getHoraSalida() - vehiculoEntity.getHoraEntrada();
-            double duracionHoras = duracionMillis / 3600000.0; // convertir a horas
-
-            double costeTotal = duracionHoras * vehiculoEntity.getTarifa();
-
-            factura.setCosteTotal(costeTotal);
-
-            return factura;
+        // 1️⃣ Comprobar que el vehículo existe
+        if (!repo.existsById(matricula)) {
+            throw new Exception("Vehículo no existe en base de datos");
         }
-        return null;
+
+        // 2️⃣ Comprobar que el vehículo está actualmente aparcado
+        Optional<VehiculoEntity> vehiculoOpt =
+                repo.findByMatriculaAndEstadoTrue(matricula);
+
+        if (vehiculoOpt.isEmpty()) {
+            throw new Exception("Vehículo no se encuentra en el parking en este momento");
+        }
+
+        // 3️⃣ Obtener entidad y actualizar salida
+        VehiculoEntity vehiculo = vehiculoOpt.get();
+
+        long horaSalida = System.currentTimeMillis();
+        vehiculo.setHoraSalida(horaSalida);
+        vehiculo.setEstado(false);
+
+        repo.save(vehiculo);
+
+        // 4️⃣ Calcular factura
+        long duracionMillis = horaSalida - vehiculo.getHoraEntrada();
+        double duracionHoras = duracionMillis / 3600000.0;
+        double costeTotal = duracionHoras * vehiculo.getTarifa();
+
+        // 5️⃣ Construir DTO
+        FacturaDTO factura = new FacturaDTO();
+        factura.setMatricula(vehiculo.getMatricula());
+        factura.setTarifa(vehiculo.getTarifa());
+        factura.setHoraEntrada(vehiculo.getHoraEntrada());
+        factura.setHoraSalida(horaSalida);
+        factura.setCosteTotal(costeTotal);
+
+        return factura;
     }
->>>>>>> 5e35cfb44b26c6a54eef665d5661ab8fa2345f86
 }

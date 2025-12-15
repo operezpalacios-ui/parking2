@@ -1,30 +1,13 @@
-<<<<<<< HEAD
-=======
 package com.example.parking.config;
 
->>>>>>> 5e35cfb44b26c6a54eef665d5661ab8fa2345f86
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/h2-console/**").permitAll()  // permitir H2
-                    .anyRequest().permitAll()                       // permitir todo
-            )
-            .csrf(csrf -> csrf
-                    .ignoringRequestMatchers("/h2-console/**")     // deshabilitar CSRF para H2
-            )
-            .headers(headers -> headers
-                    .frameOptions(frame -> frame.sameOrigin())     // permitir frames para H2
-            );
+@Configuration
+public class SecurityConfig {
 
-<<<<<<< HEAD
-    return http.build();
-=======
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -46,5 +29,4 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
         return http.build();
     }
->>>>>>> 5e35cfb44b26c6a54eef665d5661ab8fa2345f86
 }
